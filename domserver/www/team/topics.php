@@ -1,6 +1,6 @@
 <?php
 /**
- * Scoreboard
+ * Topics
  *
  * Part of the DOMjudge Programming Contest Jury System and licenced
  * under the GNU GPL. See README and COPYING for details.
@@ -31,6 +31,12 @@ require(LIBWWWDIR . '/footer.php');
 
 
 
+?>
+<?php
+
+//add new topic
+    echo "<div class = 'content'><p><a href='/team/newtopic.php?cid=".$_GET['cid']."&scid=".$_GET['scid']."'>
+        add new topic</a></p></div>";
 ?>
 
 <div class="content">

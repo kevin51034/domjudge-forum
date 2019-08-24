@@ -1997,3 +1997,63 @@ function hex_to_color($hex)
 
     return $bestmatch;
 }
+
+
+/*
+function addnewtopic($cid , $scid){
+    global $DB, $pagename , $username;
+    //echo "<p>addnewtopic</p>";
+    //echo "<p>$pagename</p>";
+
+    //session_start();
+
+    //$topic = addslashes($_POST['topic']);
+    $topic = $_POST['topic'];
+    $content = nl2br(addslashes($_POST['content']));
+    //$cid = $_GET['cid'];
+    //$scid = $_GET['scid'];
+    echo "<p>$topic</p>";
+    echo "<p>$content</p>";
+    echo "<p>$cid</p>";
+    echo "<p>$scid</p>";
+    echo "<p>$username</p>";
+    //echo now();
+
+
+    //username? error 500
+    /*$DB->q("INSERT INTO topics (`category_id` , `subcategory_id` , `author` , 
+            `title` , `content` , `date_posted`)
+            VALUES ('".$cid."' , '".$scid."' , '".$username."' , 
+            '".$topic."' , '".$content."' , NOW());");*/
+
+    /*$DB->q("INSERT INTO topics (`category_id` , `subcategory_id` , `author` , 
+            `title` , `content` , `date_posted`)
+            VALUES ($cid , $scid , $username , 
+            $topic , $content , now()");*/
+    
+    //$insert = $DB->q("INSERT INTO topics (category_id, subcategory_id, author, title, content, date_posted)
+    //VALUES('$cid', '$scid', '$username', '$topic', '$content', now())");
+
+    
+    /*$insert = $DB->q("INSERT INTO `topics`(`category_id`, `subcategory_id`, 
+            `author`, `title`, `content`, `date_posted`) 
+            VALUES ('$cid','$scid',
+            '$username','$title','$content',now())");*/
+    
+    //if($insert){
+     //   header("Location: /team/topics.php?cid=".$cid."&scid=".$scid."");
+    //}
+    
+
+    /* SELECT work
+    $res = $DB->q("SELECT * FROM topics");
+    echo "<p>$res</p>";
+
+    $rownum = $res->count();
+    echo "<p>$rownum</p>";*/
+    //error_reporting(E_ALL);
+//}
+
+//ini_set('display_errors',1);
+//error_reporting(E_ALL);
+?>

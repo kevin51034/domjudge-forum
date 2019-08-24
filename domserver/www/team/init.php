@@ -27,6 +27,8 @@ require_once(LIBWWWDIR . '/printing.php');
 require_once(LIBWWWDIR . '/auth.php');
 require_once(LIBWWWDIR . '/forms.php');
 require_once(LIBWWWDIR . '/forum.php');
+//require_once(LIBWWWDIR . '/newtopic.php');
+require_once(LIBWWWDIR . '/addnewtopic.php');
 
 logged_in();
 if (!checkrole('team')) {

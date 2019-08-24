@@ -1,5 +1,9 @@
 <?php
-
+ini_set('display_errors',1);
+error_reporting(E_ALL);
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors', 'On');
+ini_set('display_startup_errors', 1);
 /**
  * Functions for calculating the scoreboard.
  *
@@ -104,4 +108,115 @@ function puttopics($cid , $scid){
     else{
         echo "<p>This category has no topic yet! <a href='/team/newtopic.php?cid=".$cid."&scid=".$scid."'</a></p>";
     }
+}
+
+function addnewtopic($cid , $scid){
+    global $DB, $pagename , $username;
+    //session_start();
+    $topic = addslashes($_POST['topic']);
+    $content = nl2br(addslashes($_POST['content']));
+
+    //******* views and replies need a default value to insert
+    $insert = $DB->q("INSERT INTO `topics`(`category_id`, `subcategory_id`, `author`, 
+    `title`, `content`, `date_posted` , `views` ,`replies`) 
+    VALUES ('$cid','$scid','$username','$topic','$content',now() , 0,0)");
+
+    //modify the condition
+    if(1){
+      header("Location: /team/topics.php?cid=".$cid."&scid=".$scid."");
+    }
+}
+
+function disptopic ($cid, $scid, $tid){
+    global $DB, $pagename , $username;
+
+    $res = $DB->q("SELECT cat_id , subcat_id , topic_id , author , title , content , date_posted
+                    FROM categories , subcategories , topics
+                    WHERE($cid = categories.cat_id)
+                    AND ($scid = subcategories.subcat_id)
+                    AND ($tid = topics.topic_id)");
+    
+    $row = $res->next();
+    echo nl2br("<div class='content'><h2 class='title'>".$row['title']."</h2>
+                <p>".$row['author']."\n".$row['date_posted']."</p></div>");
+    echo "<div class='content'><p>".$row['content']."</p></div>";
+}
+
+function addview($cid, $scid, $tid){
+    global $DB, $pagename , $username;
+
+    $update = $DB->q("UPDATE topics SET views = views+1
+                      WHERE category_id = '$cid'
+                      AND subcategory_id = '$scid'
+                      AND topic_id = '$tid'");
+}
+
+function replylink($cid, $scid, $tid){
+    echo "<p><a href='/team/replyto.php?cid=".$cid."&scid=".$scid."&tid=".$tid."'>Reply to this post</a></p>";
+}
+
+function replytopost($cid, $scid, $tid){
+    echo "<div class='content'><form action='/team/addreply.php?cid=".$cid."&scid=".$scid."&tid=".$tid."' method='POST'>
+          <p>Comment: </p>
+          <textarea cols='80' rows='5' id='comment' name='comment'></textarea><br/>
+          <input type='submit' value='add comment' />
+          </form></div>";
+}
+
+function addreply($cid, $scid, $tid){
+    global $DB, $pagename , $username;
+
+    $comment = nl2br(addslashes($_POST['comment']));
+    //$content = nl2br(addslashes($_POST['content']));
+
+    echo "<p>$cid</p>";
+    echo "<p>$scid</p>";
+    echo "<p>$tid</p>";
+    echo "<p>$username</p>";
+    echo "<p>$comment</p>";
+    
+    $insert = $DB->q("INSERT INTO `replies` (`category_id`, `subcategory_id`, `topic_id`,
+                      `author`, `comment`, `date_posted`)
+                      VALUES ('$cid', '$scid', '$tid', '$username', '$comment', now())");
+
+    //modify
+    if(1){
+        header("Location: /team/readtopic.php?cid=".$cid."&scid=".$scid."&tid=".$tid."");
+    }
+}
+
+function dispreplies($cid, $scid, $tid){
+    global $DB, $pagename , $username;
+
+    $res = $DB->q("SELECT replies.author, comment, replies.date_posted
+                   FROM categories, subcategories, topics, replies
+                   WHERE ($cid = replies.category_id)
+                   AND ($scid = replies.subcategory_id)
+                   AND ($tid = replies.topic_id)
+                   AND ($cid = categories.cat_id)
+                   AND ($scid = subcategories.subcat_id)
+                   AND ($tid = topics.topic_id)
+                   ORDER BY reply_id DESC");
+    
+    if($res){
+        echo "<div class='content'><table class='reply-table'>";
+        while($row = $res->next()){
+            echo nl2br("<tr><th width='15%'>".$row['author']."</th><td>".$row['date_posted']."\n
+                        ".$row['comment']."\n\n</td></tr>");
+        }
+        echo "</table></div>";
+    }
+}
+
+function countReplies($cid, $scid, $tid){
+    global $DB, $pagename , $username;
+
+    $res = $DB->q("SELECT category_id, subcategory_id, topic_id
+                   FROM replies
+                   WHERE ($cid = category_id)
+                   AND ($scid = subcategory_id)
+                   AND ($tid = topic_id)");
+    
+    $rownum = $res->count();
+    return $rownum;
 }
