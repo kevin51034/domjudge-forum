@@ -32,11 +32,15 @@ require(LIBWWWDIR . '/footer.php');
 
 
 ?>
+
 <?php
 
-//add new topic
-    echo "<div class = 'content'><p><a href='/team/newtopic.php?cid=".$_GET['cid']."&scid=".$_GET['scid']."'>
-        add new topic</a></p></div>";
+//add new topic  delete <p>
+    echo "<div class = 'addpostbuttom'>
+            <a href='/team/newtopic.php?cid=".$_GET['cid']."&scid=".$_GET['scid']."'>add new topic</a>
+          </div>";
+    
+    echo "<div id = 'back'><a href='/team/forum.php'>back</a></div>";
 ?>
 
 <div class="content">

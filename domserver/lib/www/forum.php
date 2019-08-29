@@ -4,6 +4,7 @@ error_reporting(E_ALL);
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 'On');
 ini_set('display_startup_errors', 1);
+
 /**
  * Functions for calculating the scoreboard.
  *
@@ -34,12 +35,9 @@ require_once(LIBDIR . '/lib.misc.php');
  * $sdata       if not NULL, use this as scoreboard data instead of fetching it locally
  */
 function putforum(){
-
     global $DB, $pagename;
-    //echo test;
+
     $res = $DB->q("SELECT * FROM categories");
-    //echo $DB;
-    //echo $res;
     while($row = $res->next()){
         //echo "<h1>".$row['category_title']."</h1>";
         echo "<table class='category-table'>";
@@ -53,8 +51,8 @@ function putforum(){
 }
 
 function putsubcategories($parent_id){
-
     global $DB, $pagename;
+
     $res = $DB->q("SELECT cat_id , subcat_id , subcategory_title , subcategory_desc
                     FROM categories , subcategories
                     WHERE ($parent_id = categories.cat_id)
@@ -137,9 +135,65 @@ function disptopic ($cid, $scid, $tid){
                     AND ($tid = topics.topic_id)");
     
     $row = $res->next();
-    echo nl2br("<div class='content'><h2 class='title'>".$row['title']."</h2>
-                <p>".$row['author']."\n".$row['date_posted']."</p></div>");
-    echo "<div class='content'><p>".$row['content']."</p></div>";
+    echo nl2br("<div class='content'><p class='title'>".$row['title']."</p>
+                <p>".$row['author']."\n".$row['date_posted']."</p><p>".$row['content']."</p></div>");
+    if($username == $row['author']){
+        echo "<div id='edittopic'><a href='/team/edittopic.php?cid=".$cid."&scid=".$scid."&tid=".$tid."'>edit</a></div>";
+        //edittopic($cid, $scid, $tid);
+    }
+}
+
+
+function edittopic($cid, $scid, $tid){
+    global $DB, $pagename , $username;
+    //echo "<div id='edittopic'>edit</div>";
+
+    
+    $res = $DB->q("SELECT cat_id , subcat_id , topic_id , author , title , content , date_posted
+                    FROM categories , subcategories , topics
+                    WHERE($cid = categories.cat_id)
+                    AND ($scid = subcategories.subcat_id)
+                    AND ($tid = topics.topic_id)");
+    
+    $row = $res->next();
+    echo "<form action='/team/edittopicpost.php?cid='$cid'&scid='$scid'&tid='$tid'
+            method='get'>
+            <p>Title:</p>
+            <input type='text' id='topic' name='topic' size='100' value='".$row['title']."'/>
+            <p>Content:</p>
+            <textarea id='content' name='content'>".$row['content']."</textarea><br/>
+            <input type='submit' value='post' /></form>";
+
+}
+
+function edittopicpost($cid, $scid, $tid){
+    global $DB, $pagename , $username;
+
+    //session_start();
+    $topic = addslashes($_GET['topic']);
+    $content = nl2br(addslashes($_GET['content']));
+    
+    
+
+    $cid = $_GET['cid'];
+    $scid = $_GET['scid'];
+    $tid = $_GET['tid'];
+
+    echo "<p>'$topic'</p>";
+    echo "<p>'$content'</p>";
+    echo "<p>'$cid'</p>";
+    echo "<p>'$scid'</p>";
+    echo "<p>'$tid'</p>";
+    //******* views and replies need a default value to insert
+    $update = $DB->q("UPDATE topics SET title = '$topic' , content = '$content'
+                      WHERE category_id = '$cid'
+                      AND subcategory_id = '$scid'
+                      AND topic_id = '$tid'");
+
+    //modify the condition
+    //if(1){
+    //  header("Location: /team/readtopic.php?cid=".$cid."&scid=".$scid."&tid=".$tid."");
+    //}
 }
 
 function addview($cid, $scid, $tid){
@@ -152,7 +206,7 @@ function addview($cid, $scid, $tid){
 }
 
 function replylink($cid, $scid, $tid){
-    echo "<p><a href='/team/replyto.php?cid=".$cid."&scid=".$scid."&tid=".$tid."'>Reply to this post</a></p>";
+    echo "<p id = 'reply'><a href='/team/replyto.php?cid=".$cid."&scid=".$scid."&tid=".$tid."'>Reply to this post</a></p>";
 }
 
 function replytopost($cid, $scid, $tid){
@@ -167,21 +221,19 @@ function addreply($cid, $scid, $tid){
     global $DB, $pagename , $username;
 
     $comment = nl2br(addslashes($_POST['comment']));
-    //$content = nl2br(addslashes($_POST['content']));
-
-    echo "<p>$cid</p>";
-    echo "<p>$scid</p>";
-    echo "<p>$tid</p>";
-    echo "<p>$username</p>";
-    echo "<p>$comment</p>";
     
     $insert = $DB->q("INSERT INTO `replies` (`category_id`, `subcategory_id`, `topic_id`,
                       `author`, `comment`, `date_posted`)
                       VALUES ('$cid', '$scid', '$tid', '$username', '$comment', now())");
 
+    $repliesnum = countreplies($cid, $scid, $tid);
     //modify
     if(1){
         header("Location: /team/readtopic.php?cid=".$cid."&scid=".$scid."&tid=".$tid."");
+        $update = $DB->q("UPDATE topics SET replies = '$repliesnum'
+                      WHERE category_id = '$cid'
+                      AND subcategory_id = '$scid'
+                      AND topic_id = '$tid'");
     }
 }
 

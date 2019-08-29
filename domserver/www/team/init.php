@@ -6,6 +6,7 @@
  * under the GNU GPL. See README and COPYING for details.
  */
 
+
 require_once('../configure.php');
 
 $pagename = basename($_SERVER['PHP_SELF']);
@@ -74,3 +75,8 @@ if (!empty($cid)) {
            (dbconfig_get('verification_required', 0) ?
              ' AND j.verified = 1' : ''), $teamid, $cid, $cdata['endtime']);
 }
+
+?>
+
+<link href="/team/style/forum.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="forum.js"></script>

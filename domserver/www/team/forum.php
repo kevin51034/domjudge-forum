@@ -6,6 +6,7 @@
  * under the GNU GPL. See README and COPYING for details.
  */
 
+ 
 $pagename = basename($_SERVER['PHP_SELF']);
 
 require('init.php');
@@ -33,9 +34,7 @@ require(LIBWWWDIR . '/footer.php');
 
 ?>
 
+
 <div class="content">
     <?php putforum(); ?>
 </div>
-
-
-

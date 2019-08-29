@@ -33,10 +33,9 @@ addview($_GET['cid'], $_GET['scid'], $_GET['tid']);
     replytopost($_GET['cid'], $_GET['scid'], $_GET['tid']);
 ?>
 
-<div class="content">
-    <?php
-        disptopic($_GET['cid'], $_GET['scid'], $_GET['tid']);
-    ?>
-</div>
+<?php
+    disptopic($_GET['cid'], $_GET['scid'], $_GET['tid']);
+?>
+
 
 

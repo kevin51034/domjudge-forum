@@ -28,15 +28,20 @@ addview($_GET['cid'], $_GET['scid'], $_GET['tid']);
     <?php
        replylink($_GET['cid'], $_GET['scid'], $_GET['tid']);
     ?>
+    
 </div>
 
 
 <?php
+    echo "<a id='backtotopics' href='/team/topics.php?cid=".$_GET['cid']."&scid=".$_GET['scid']."'>back</a>";
     disptopic($_GET['cid'], $_GET['scid'], $_GET['tid']);
+
     echo "<div class ='content'><p>All Replies (".countReplies($_GET['cid'], $_GET['scid'], $_GET['tid']).")
         </p></div>";
 
     dispreplies($_GET['cid'], $_GET['scid'], $_GET['tid']);
+
+    replytopost($_GET['cid'], $_GET['scid'], $_GET['tid']);
 ?>
 
 
