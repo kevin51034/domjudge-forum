@@ -45,7 +45,9 @@ function putforum(){
         putsubcategories($row['cat_id']);
         echo "</table>";
     }
-    
+    if (checkrole('jury')) {
+        echo "<a id='editcat' href='/team/editcat.php'>edit</a>";
+    }
     
     return;
 }
@@ -68,6 +70,61 @@ function putsubcategories($parent_id){
         echo "<td class='num-topics'>".getnumtopics($parent_id , $row['subcat_id'])."</td></tr>";
     }
     //echo "<h1>".$row['category_title']."</h1>";
+
+}
+
+function editcat() {
+    global $DB, $pagename;
+
+    $res = $DB->q("SELECT * FROM categories");
+    while($row = $res->next()){
+        //echo "<h1>".$row['category_title']."</h1>";
+        echo "<form action='/team/editcatpost.php'
+        method='POST'><table class='category-table'>";
+        echo "<tr><td class='main-category' colspan='2'><input type='text' id='category' name='category' size='100' value='".$row['category_title']."'/></td></tr>";
+        editsubcat($row['cat_id']);
+        echo "</table><input type='submit' value='edit'/></form>";
+    }
+}
+
+function editsubcat($parent_id){
+    global $DB, $pagename;
+
+    $res = $DB->q("SELECT cat_id , subcat_id , subcategory_title , subcategory_desc
+                    FROM categories , subcategories
+                    WHERE ($parent_id = categories.cat_id)
+                    AND ($parent_id = subcategories.parent_id) ");
+
+    echo "<tr><th width='90%'>Categories</th><th width='10%'>Topics</th></tr>";
+    while($row = $res->next()){
+        echo "<tr><td class='category-title'><input type='text' id='subtitle' name='".$row['subcat_id']."' size='100' value='".$row['subcategory_title']."'/>
+            <br/>";
+        echo "<input type='text' id='subdesc' name='".$row['subcat_id']."' size='100' value='".$row['subcategory_desc']."'/></td>";
+        echo "<td class='num-topics'>".getnumtopics($parent_id , $row['subcat_id'])."</td></tr>";
+    }
+}
+
+
+//modify the passing
+function editcatpost() {
+    global $DB, $pagename;
+    $category = $_POST['category'];
+
+
+    $res = $DB->q("SELECT cat_id , subcat_id , subcategory_title , subcategory_desc
+                    FROM categories , subcategories
+                    WHERE ($parent_id = categories.cat_id)
+                    AND ($parent_id = subcategories.parent_id) ");
+    
+    while($row = $res->next()){
+        //$subcategory = $_POST['1'];
+        //$subcategorydesc = $_POST[$row['subcat_id']];
+    }
+    
+
+    echo "<p>'$category'</p>";
+    echo "<p>'$subcategory'</p>";
+    echo "<p>'$subcategorydesc'</p>";
 
 }
 
@@ -136,7 +193,8 @@ function disptopic ($cid, $scid, $tid){
     
     $row = $res->next();
     echo nl2br("<div class='content'><p class='title'>".$row['title']."</p>
-                <p>".$row['author']."\n".$row['date_posted']."</p><p>".$row['content']."</p></div>");
+                <p class ='topiccontent'>".$row['author']."\n".$row['date_posted']."</p><p class ='topiccontent'>".$row['content']."</p></div>");
+    
     if($username == $row['author']){
         echo "<div id='edittopic'><a href='/team/edittopic.php?cid=".$cid."&scid=".$scid."&tid=".$tid."'>edit</a></div>";
         //edittopic($cid, $scid, $tid);
@@ -156,13 +214,20 @@ function edittopic($cid, $scid, $tid){
                     AND ($tid = topics.topic_id)");
     
     $row = $res->next();
-    echo "<form action='/team/edittopicpost.php?cid='$cid'&scid='$scid'&tid='$tid'
+    /*echo "<form action='/team/edittopicpost.php?cid='$cid'&scid='$scid'&tid='$tid'
             method='get'>
             <p>Title:</p>
             <input type='text' id='topic' name='topic' size='100' value='".$row['title']."'/>
             <p>Content:</p>
             <textarea id='content' name='content'>".$row['content']."</textarea><br/>
-            <input type='submit' value='post' /></form>";
+            <input type='submit' value='post' /></form>";*/
+    echo "<form action='/team/edittopicpost.php?cid=".$_GET['cid']."&scid=".$_GET['scid']."&tid=".$_GET['tid']."'
+            method='POST'>
+            <p>Title:</p>
+            <input type='text' id='topic' name='topic' size='100' value='".$row['title']."'/>
+            <p>Content:</p>
+            <textarea id='content' name='content'>".$row['content']."</textarea><br/>
+            <input type='submit' value='post'/></form>";
 
 }
 
@@ -170,20 +235,9 @@ function edittopicpost($cid, $scid, $tid){
     global $DB, $pagename , $username;
 
     //session_start();
-    $topic = addslashes($_GET['topic']);
-    $content = nl2br(addslashes($_GET['content']));
-    
-    
+    $topic = addslashes($_POST['topic']);
+    $content = nl2br(addslashes($_POST['content']));
 
-    $cid = $_GET['cid'];
-    $scid = $_GET['scid'];
-    $tid = $_GET['tid'];
-
-    echo "<p>'$topic'</p>";
-    echo "<p>'$content'</p>";
-    echo "<p>'$cid'</p>";
-    echo "<p>'$scid'</p>";
-    echo "<p>'$tid'</p>";
     //******* views and replies need a default value to insert
     $update = $DB->q("UPDATE topics SET title = '$topic' , content = '$content'
                       WHERE category_id = '$cid'
@@ -191,9 +245,9 @@ function edittopicpost($cid, $scid, $tid){
                       AND topic_id = '$tid'");
 
     //modify the condition
-    //if(1){
-    //  header("Location: /team/readtopic.php?cid=".$cid."&scid=".$scid."&tid=".$tid."");
-    //}
+    if(1){
+      header("Location: /team/readtopic.php?cid=".$cid."&scid=".$scid."&tid=".$tid."");
+    }
 }
 
 function addview($cid, $scid, $tid){
@@ -211,9 +265,9 @@ function replylink($cid, $scid, $tid){
 
 function replytopost($cid, $scid, $tid){
     echo "<div class='content'><form action='/team/addreply.php?cid=".$cid."&scid=".$scid."&tid=".$tid."' method='POST'>
-          <p>Comment: </p>
-          <textarea cols='80' rows='5' id='comment' name='comment'></textarea><br/>
-          <input type='submit' value='add comment' />
+          <p class ='topiccontent'>Comment: </p>
+          <textarea cols='80' rows='5' id='comment' name='comment' class ='topiccontent'></textarea><br/>
+          <input type='submit' value='add comment' class ='topiccontent'/>
           </form></div>";
 }
 

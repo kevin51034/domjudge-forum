@@ -34,6 +34,7 @@ global $updates;
 <?php if (checkrole('jury')) {
         ?>
 <a href="teams.php" accesskey="t"><span class="octicon octicon-organization"></span> teams</a>
+<a href="/team/index.php" accesskey="t"><span class="octicon octicon-organization"></span> teampage</a>
 <a href="users.php" accesskey="u"><span class="octicon octicon-person"></span> users</a>
 <?php
     $nunread = count($updates['clarifications']);
