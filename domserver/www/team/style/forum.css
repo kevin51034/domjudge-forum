@@ -52,8 +52,12 @@ div.content {
 	padding: 15px;
 }
 
-div.content p , div.content table{
+.topiccontent {
     margin-left: 3%;
+}
+
+div.content p , div.content table{
+    //margin-left: 3%;
 }
 
 p.title {
@@ -241,4 +245,8 @@ table.reply-table td {
     margin-right: 15%;
     width:70%;
     height:90%;
+}
+
+#editcat {
+    //margin-left:90%;
 }

@@ -13,19 +13,18 @@ require('init.php');
 //    'after' => 30,
 //    'url' => 'forum.php',
 //);
-$title = 'editTopics';
+$title = 'editcat';
 
 // This reads and sets a cookie, so must be called before headers are sent.
 $filter = initScorefilter();
 
 require(LIBWWWDIR . '/header.php');
 
-
 require(LIBWWWDIR . '/footer.php');
-
 
 error_reporting(E_ALL);
 ?>
+
 
 <div class="content">
     <?php
@@ -39,7 +38,7 @@ error_reporting(E_ALL);
             <textarea id='content' name='content'></textarea><br/>
             <input type='submit' value='add new post'/></form>";
     */
-        edittopic($_GET['cid'], $_GET['scid'], $_GET['tid']);
+        editcat();
     ?>
 </div>
 

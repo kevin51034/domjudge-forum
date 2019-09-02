@@ -32,14 +32,14 @@ require_once(LIBWWWDIR . '/forum.php');
 require_once(LIBWWWDIR . '/addnewtopic.php');
 
 logged_in();
-if (!checkrole('team')) {
+if (!checkrole('team') && !checkrole('jury')) {
     error("You do not have permission to perform that action (Missing role: 'team')");
 }
-if (empty($teamdata)) {
+if (empty($teamdata) && !checkrole('jury')) {
     error("You do not have a team associated with your account.  Please contact a staff member.");
 }
 
-if ($teamdata['enabled'] != 1) {
+if ($teamdata['enabled'] != 1 && !checkrole('jury')) {
     error("Team is not enabled.");
 }
 

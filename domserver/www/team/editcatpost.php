@@ -9,6 +9,6 @@ ini_set('display_startup_errors', 1);
     //require_once(LIBDIR . '/lib.misc.php');
 
     // in lib/www/forum.php
-    edittopicpost($_GET['cid'] , $_GET['scid'] , $_GET['tid']);
+    editcatpost();
 
 ?>
