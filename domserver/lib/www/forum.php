@@ -94,6 +94,7 @@ function editsubcat($parent_id){
                     FROM categories , subcategories
                     WHERE ($parent_id = categories.cat_id)
                     AND ($parent_id = subcategories.parent_id) ");
+            //print_r($res);
 
     echo "<tr><th width='90%'>Categories</th><th width='10%'>Topics</th></tr>";
     while($row = $res->next()){
@@ -104,27 +105,51 @@ function editsubcat($parent_id){
     }
 }
 
-
 //modify the passing
 function editcatpost() {
     global $DB, $pagename;
     $category = $_POST['category'];
 
-
-    $res = $DB->q("SELECT cat_id , subcat_id , subcategory_title , subcategory_desc
+    $res = $DB->q("SELECT cat_id , category_title , subcat_id , subcategory_title , subcategory_desc
                     FROM categories , subcategories
-                    WHERE ($parent_id = categories.cat_id)
-                    AND ($parent_id = subcategories.parent_id) ");
-    
+                    WHERE (categories.cat_id = subcategories.parent_id) ");
+            //print_r($res);
+
     while($row = $res->next()){
-        //$subcategory = $_POST['1'];
-        //$subcategorydesc = $_POST[$row['subcat_id']];
+        $cat_id = $row['cat_id'];
+        $category_title = $row['category_title'];
+        $subcat_id = $row['subcat_id'];
+        $subcategory_title = $row['subcategory_title'];
+        $subcategory_desc = $row['subcategory_desc'];
+        //echo "<p>'$row'</p>";
+        print_r($row);
+
+        echo "<p>'$cat_id'</p>";
+        echo "<p>'$category_title'</p>";
+        echo "<p>'$subcat_id'</p>";
+        echo "<p>'$subcategory_title'</p>";
+        echo "<p>'$subcategory_desc'</p>";
+        echo "<p>'$parent_id'</p>";
+
+        echo "<br><br>";
+
+        
+        $cat_id  = $_POST[$cat_id ];
+        $category_title = $_POST['category'];
+        $subcat_id = $_POST[$subcat_id];
+        $subcategory_title  = $_POST[$subcategory_title];
+        $subcategory_desc = $_POST[$subcategory_desc];
+
+        //echo "<p>'$cat_id '</p>";
+        echo "<p>'$category_title'</p>";
+        //echo "<p>'$subcat_id'</p>";
+        echo "<p>'$subcategory_title'</p>";
+        echo "<p>'$subcategory_desc'</p>";
+        echo "<br><br>";
     }
     
 
-    echo "<p>'$category'</p>";
-    echo "<p>'$subcategory'</p>";
-    echo "<p>'$subcategorydesc'</p>";
+    
 
 }
 
@@ -195,12 +220,25 @@ function disptopic ($cid, $scid, $tid){
     echo nl2br("<div class='content'><p class='title'>".$row['title']."</p>
                 <p class ='topiccontent'>".$row['author']."\n".$row['date_posted']."</p><p class ='topiccontent'>".$row['content']."</p></div>");
     
-    if($username == $row['author']){
+    if($username == $row['author'] || checkrole('jury')){
         echo "<div id='edittopic'><a href='/team/edittopic.php?cid=".$cid."&scid=".$scid."&tid=".$tid."'>edit</a></div>";
+        echo "<div id='edittopic'><a href='/team/readtopic.php?cid=".$cid."&scid=".$scid."&tid=".$tid."&delete=true'>delete topic</a></div>";
         //edittopic($cid, $scid, $tid);
     }
 }
 
+function deletetopic($cid, $scid, $tid){
+    global $DB, $pagename , $username;
+    echo "<p>'$cid'</p>";
+    echo "<p>'$scid'</p>";
+    echo "<p>'$tid'</p>";
+
+    $delete = $DB->q("DELETE FROM topics WHERE (topic_id = $tid)");
+
+    if(1){
+        header("Location: /team/topics.php?cid=".$cid."&scid=".$scid."");
+      }
+}
 
 function edittopic($cid, $scid, $tid){
     global $DB, $pagename , $username;

@@ -42,6 +42,10 @@ addview($_GET['cid'], $_GET['scid'], $_GET['tid']);
     dispreplies($_GET['cid'], $_GET['scid'], $_GET['tid']);
 
     replytopost($_GET['cid'], $_GET['scid'], $_GET['tid']);
+
+    if (isset($_GET['delete'])) {
+        deletetopic($_GET['cid'], $_GET['scid'], $_GET['tid']);
+      }
 ?>
 
 
