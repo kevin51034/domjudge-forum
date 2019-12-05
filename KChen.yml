@@ -1,0 +1,79 @@
+version: "3.7"
+
+services:
+        dj-mariadb:
+                image: mariadb
+                environment:
+                        - MYSQL_ROOT_PASSWORD=rootpw
+                        - MYSQL_DATABASE=domjudge
+                        - MYSQL_USER=domjudge
+                        - MYSQL_PASSWORD=djpw
+                networks:
+                        - dj-db
+                ports:
+                        - 13310:3310
+                command:
+                        --max-connections=1000
+        
+        dj-domserver:
+                image: domjudge/domserver:6.0.3
+                volumes:
+                        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+                        - /domjudgeKChen/opt/domjudge:/opt/domjudge
+                environment:
+                        - CONTAINER_TIMEZONE=Asia/Taipei
+                        - MYSQL_ROOT_PASSWORD=rootpw
+                        - MYSQL_DATABASE=domjudge
+                        - MYSQL_USER=domjudge
+                        - MYSQL_PASSWORD=djpw
+                networks:
+                        dj-db:
+                        dj-judgedaemons:
+                depends_on:
+                        - phpmyadmin
+                        - dj-mariadb
+                ports:
+                        - 9090:80
+                links:
+                        - dj-mariadb:mariadb
+                restart: always
+
+        dj-judgehost:
+                image: domjudge/judgehost:latest
+                privileged: true
+                #hostname: judgedaemon-0
+                container_name: judgedaemon-0
+                volumes:
+                        - /sys/fs/cgroup:/sys/fs/cgroup:ro
+                environment:
+                        - CONTAINER_TIMEZONE=Asia/Taipei
+                        - DAEMON_ID=0
+                        - JUDGEDAEMON_PASSWORD=domjudge
+                networks:
+                        - dj-judgedaemons
+                depends_on:
+                        - dj-domserver
+                links:
+                        - dj-domserver:domserver
+                restart: always
+        phpmyadmin:
+                image: phpmyadmin/phpmyadmin
+                container_name: KCmyadmin
+                ports:
+                        - 9999:80
+                networks: 
+                        - dj-db
+                environment:
+                        - PMA_ARBITRARY=1
+                        - PMA_HOST=dj-mariadb
+                links:
+                        - dj-mariadb:db
+
+networks:
+        default:
+        dj-db:
+                driver: bridge
+        dj-judgedaemons:
+                driver: bridge
+        phpmyadmin:
+                driver: bridge
